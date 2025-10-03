@@ -3,6 +3,7 @@ import 'dotenv/config'
 import cors from 'cors'
 import rootRoute from './routes/root.route'
 import connectMongoDB from './db/connectMongoDB'
+import { errorHandler } from './utils/defaultErrorHandler'
 
 const app = express()
 const PORT = process.env.PORT
