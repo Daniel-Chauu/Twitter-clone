@@ -3,6 +3,8 @@ const AUTH_MESSAGE = {
   NAME_IS_REQUIRED: 'Name is required',
   NAME_MUST_BE_A_STRING: 'Name must be a string',
   NAME_LENGTH_MUST_BE_FROM_2_TO_100: 'Name length must be from 2 to 100 characters',
+  USER_NAME_IS_REQUIRED: 'Username is required',
+  FULLNAME_IS_REQUIRED: 'Fullname is required',
   PASSOWRD_IS_REQUIRED: 'Password is required',
   PASSWORD_LENGTH_MUST_BE_FROM_6_TO_50: 'Password length must be from 6 to 50 characters',
   PASSWORD_MUST_BE_A_STRING: 'Password must be a string',
@@ -37,7 +39,7 @@ const AUTH_MESSAGE = {
   BIO_MUST_BE_A_STRING: 'Bio must be a string',
   BIO_LENGTH_MUST_BE_FROM_2_TO_200: 'Bio length must be from 2 to 200',
   USERNAME_MUST_BE_A_STRING: 'Username must be a string',
-  USERNAME_LENGTH_MUST_BE_FROM_2_TO_50: 'Username length must be from 2 to 50',
+  USERNAME_LENGTH_MUST_BE_FROM_4_TO_50: 'Username length must be from 4 to 50',
   IMAGE_URL_MUST_BE_A_STRING: 'Image url must be a string',
   UPDATE_PROFILE_IS_SUCCESSFULLY: 'Update profile is successfully',
   FOLLOWED: 'followed',
@@ -48,14 +50,15 @@ const AUTH_MESSAGE = {
   YOU_HAVE_NOT_FOLLOWED_THIS_USER: 'You have not followed this user',
   INVALID_USERNAME:
     'username must be 4-15 characters long and contain only letters, numbers, and underscores, not only numbers',
-  USERNAME_EXISTED: 'Username existed',
+  USERNAME_ALREADY_EXISTS: 'Username already exists',
   OLD_PASSWORD_IS_INCORRECT: 'Old password is incorrect',
   OLD_PASSWORD_IS_REQUIRED: 'Old password is required',
   UPDATE_PASSWORD_IS_SUCCESSFULLY: 'Update password is successfully',
   GMAIL_NOT_VERIFIED: 'Gmail not verified',
   UPLOAD_IMAGE_IS_SUCCESSFULLY: 'Upload image is successfully',
   UPLOAD_VIDEO_IS_SUCCESSFULLY: 'Upload video is successfully',
-  RANGE_IS_REQUIRED: 'Range is required'
+  RANGE_IS_REQUIRED: 'Range is required',
+  LOGOUT_SUCCESS: 'Logout successfully'
 } as const
 
 const TWEET_MESSAGE = {

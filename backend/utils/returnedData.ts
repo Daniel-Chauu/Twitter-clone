@@ -5,3 +5,5 @@ const returnedData = (success: boolean, message: string, data?: any) => {
     data
   }
 }
+
+export default returnedData

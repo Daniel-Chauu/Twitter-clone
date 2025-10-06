@@ -1,6 +1,7 @@
-import mongoose from 'mongoose'
+import mongoose, { ObjectId } from 'mongoose'
 
-export type UserType = {
+export interface IUser {
+  _id: ObjectId
   username: string
   fullname: string
   password: string
@@ -13,7 +14,7 @@ export type UserType = {
   link?: string
 }
 
-const userSchema = new mongoose.Schema<UserType>(
+const userSchema = new mongoose.Schema<IUser>(
   {
     username: {
       type: String,
@@ -70,4 +71,4 @@ const userSchema = new mongoose.Schema<UserType>(
   }
 )
 
-export const User = mongoose.model<UserType>('User', userSchema)
+export const User = mongoose.model<IUser>('User', userSchema)

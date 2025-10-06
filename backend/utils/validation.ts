@@ -14,7 +14,6 @@ const validate = (validation: RunnableValidationChains<ValidationChain>) => {
     if (errors.isEmpty()) return next()
 
     const errorsObj = errors.mapped()
-    console.log('🚀 ~ errorsObj:', errorsObj)
     const statusError = new StatusError({ message: '', status: HTTP_STATUS.BAD_REQUEST })
     const entityError = new EntityError({ errors: {} })
 
