@@ -61,6 +61,19 @@ const AUTH_MESSAGE = {
   LOGOUT_SUCCESS: 'Logout successfully'
 } as const
 
+const USER_MESSAGE = {
+  GET_PROFILE_SUCCESS: 'Get profile successfully',
+  FOLLOWED_USER_ID_MUST_BE_A_VALID_OBJECT_ID: 'Followed user id must be a valid ObjectId',
+  YOU_CAN_NOT_FOLLOW_OR_UNFOLLOW_YOURSELF: "You can't follow / unfollow yourself",
+  USER_FOLLOWED_SUCCESSFULLY: 'User followed successfully ',
+  USER_UNFOLLOWED_SUCCESSFULLY: 'User unfollowed successfully ',
+  GET_SUGGESTED_USER_SUCCESSFULLY: 'Get suggested user successfully',
+  PLEASE_PROVIDE_BOTH_CURRENT_AND_NEW_PASSWORD: 'Please provide both current password and new password',
+  CURRENT_PASSWORD_IS_INCORRECT: 'Current password is incorrect',
+  USERNAME_ALREADY_EXISTS: 'Username already exists, Let try another username',
+  UPDATE_PROFILE_SUCCESS: 'Update profile successfully'
+} as const
+
 const TWEET_MESSAGE = {
   INVALID_TYPE: 'Invalid type',
   INVALID_AUDIENCE: 'Invalid audience',
@@ -96,4 +109,4 @@ const LIKE_MESSAGE = {
   YOU_HAVE_NOT_LIKE_THIS_POST: 'You have not like this post'
 }
 
-export { AUTH_MESSAGE, TWEET_MESSAGE, BOOKMARK_MESSAGE, LIKE_MESSAGE }
+export { AUTH_MESSAGE, USER_MESSAGE, TWEET_MESSAGE, BOOKMARK_MESSAGE, LIKE_MESSAGE }

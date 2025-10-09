@@ -5,3 +5,16 @@ export type LoginReqBody = {
   email: string
   password: string
 }
+
+export type GetProfileParams = {
+  username: string
+}
+
+export type FollowUnfollowParams = {
+  followed_user_id: string
+}
+
+export type UpdateProfileReqBody = Pick<IUser, 'bio' | 'coverImg' | 'fullname' | 'link' | 'profileImg' | 'username'> & {
+  newPassword: string
+  currentPassword: string
+}

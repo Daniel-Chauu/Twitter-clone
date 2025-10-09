@@ -1,7 +1,7 @@
 import mongoose, { ObjectId } from 'mongoose'
 
 export interface IUser {
-  _id: ObjectId
+  _id: mongoose.Types.ObjectId
   username: string
   fullname: string
   password: string
@@ -37,14 +37,14 @@ const userSchema = new mongoose.Schema<IUser>(
     },
     followers: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.ObjectId,
         ref: 'User',
         default: []
       }
     ],
     following: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.ObjectId,
         ref: 'User',
         default: []
       }

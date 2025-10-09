@@ -7,4 +7,8 @@ const hashPassword = (password: string) => {
   return hashedPassword
 }
 
-export { hashPassword }
+const comparePassword = (password: string, hashedPassword: string) => {
+  return bcrypt.compare(password, hashedPassword)
+}
+
+export { hashPassword, comparePassword }
