@@ -8,6 +8,7 @@ export interface IUser {
   email: string
   followers?: mongoose.Types.ObjectId[]
   following?: mongoose.Types.ObjectId[]
+  likedPosts?: mongoose.Types.ObjectId[]
   profileImg?: string
   coverImg?: string
   bio?: string
@@ -64,7 +65,14 @@ const userSchema = new mongoose.Schema<IUser>(
     link: {
       type: String,
       default: ''
-    }
+    },
+    likedPosts: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Post',
+        default: []
+      }
+    ]
   },
   {
     timestamps: true

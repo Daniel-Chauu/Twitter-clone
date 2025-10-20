@@ -74,29 +74,22 @@ const USER_MESSAGE = {
   UPDATE_PROFILE_SUCCESS: 'Update profile successfully'
 } as const
 
-const TWEET_MESSAGE = {
-  INVALID_TYPE: 'Invalid type',
-  INVALID_AUDIENCE: 'Invalid audience',
-  PARENT_ID_MUST_BE_A_VALID_TWEET_ID: 'parent id must be a valid tweet id',
-  PARENT_ID_MUST_BE_NULL: 'parent id must be null',
-  CONTENT_MUST_BE_A_NON_EMPTY_STRING: 'Content must be a non empty string',
-  CONTENT_MUST_BE_A_EMPTY_STRING: 'Content must be a empty string',
-  HASHTAG_MUST_BE_AN_ARR_OF_STRING: 'Hashtags must be an array of string',
-  MENTIONS_MUST_BE_AN_ARR_OF_OBJECT_ID: 'Mentions must be an array of ObjectId',
-  MEDIAS_MUST_BE_AN_ARRAY_OF_MEDIA: 'Medias must be an array of Media',
-  CREATE_TWEET_SUCCESSFULLY: 'Create tweet is successfully',
-  TWEET_ID_MUST_BE_AN_OBJECT_ID: 'tweet_id must be an ObjectId ',
-  TWEET_ID_IS_REQUIRED: 'tweet_id is required',
-  TWEET_ID_DOES_NOT_EXIST: 'tweet_id does not exist',
-  YOU_MUST_BE_LOGGED_IN_TO_VIEW_THIS_TWEET: 'You must be logged in to view this tweet',
-  TWEET_IS_NOT_PUBLIC: 'Tweet is not public',
-  GET_TWEET_SUCCESSFULLY: 'Get tweet successfully',
-  GET_TWEETS_SUCESSFULLY: 'Get tweets successfully',
-  LIMIT_MUST_BE_A_NUMBER: 'Limit must be a number',
-  LIMIT_MUST_BE_FROM_1_TO_100: 'Limit must be from 1 to 100',
-  PAGE_MUST_ALWAYS_BE_GREATER_THAN_1: 'Page must be always greater than 1',
-  SEARCH_SUCCESSFULLY: 'Search successfully'
-} as const
+const POST_MESSAGE = {
+  IMAGE_IS_REQUIRED: 'Image is required, Post must have img',
+  TEXT_IS_REQUIRED: 'Text is required, Post must have text',
+  CREATE_POST_SUCCESSFULLY: 'Post created successfully',
+  POST_NOT_FOUND_OR_ALREADY_DELETED: 'Post not found or already deleted',
+  USER_IS_NOT_AUTHORIZED_TO_DELTE_THIS_POST: 'User is not authorized to delete this post',
+  POST_DELETED_SUCCESSFULLY: 'Post deleted successfully',
+  POST_ID_MUST_BE_A_VALID_OBJECT_ID: 'Post id must be a valid object id',
+  COMMENT_SUCCESSFULLY: 'Comment successfully',
+  POST_UNLIKED_SUCCESSFULLY: 'Post unliked successfully',
+  POST_LIKED_SUCCESSFULLY: 'Post liked successfully',
+  ALL_POST_GOT_SUCCESSFULLY: 'All posts got successfully',
+  LIKED_POST_GOT_SUCCESSFULLY: 'Liked posts got successfully',
+  FOLLOWING_POST_GOT_SUCCESSFULLY: 'Following posts got successfully',
+  USER_POST_GOT_SUCCESSFULLY: 'User posts got successfully'
+}
 
 const BOOKMARK_MESSAGE = {
   BOOKMARK_SUCCESSFULLY: 'Bookmark successfully',
@@ -109,4 +102,4 @@ const LIKE_MESSAGE = {
   YOU_HAVE_NOT_LIKE_THIS_POST: 'You have not like this post'
 }
 
-export { AUTH_MESSAGE, USER_MESSAGE, TWEET_MESSAGE, BOOKMARK_MESSAGE, LIKE_MESSAGE }
+export { AUTH_MESSAGE, USER_MESSAGE, POST_MESSAGE, BOOKMARK_MESSAGE, LIKE_MESSAGE }

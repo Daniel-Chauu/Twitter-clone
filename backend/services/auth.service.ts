@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { ObjectId, RootFilterQuery } from 'mongoose'
+import mongoose, { ObjectId, RootFilterQuery } from 'mongoose'
 import { AUTH_MESSAGE } from '~/constants/messages'
 import { IUser, User } from '~/models/user.model'
 import { hashPassword } from '~/utils/bcrypt'
@@ -36,7 +36,7 @@ class AuthService {
     }
   }
 
-  async login(user_id: ObjectId) {
+  async login(user_id: mongoose.Types.ObjectId) {
     const access_token = await this.signAccessToken(String(user_id))
 
     return returnedData(true, AUTH_MESSAGE.LOGIN_SUCCESS, {

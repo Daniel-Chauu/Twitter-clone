@@ -18,3 +18,20 @@ export type UpdateProfileReqBody = Pick<IUser, 'bio' | 'coverImg' | 'fullname' |
   newPassword: string
   currentPassword: string
 }
+
+export type CreatePostReqBody = {
+  img: string
+  text: string
+}
+
+export type PostIdParams = {
+  post_id: string
+}
+
+export type PostCommentReqBody = {
+  text: string
+}
+
+export type GetUserPostParams = {
+  username: string
+}

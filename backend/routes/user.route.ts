@@ -8,7 +8,7 @@ const userRoute = Router()
 
 userRoute.get('/profile/:username', getUserProfileValidator, wrapRequestHandler(userController.getUserProfile))
 
-userRoute.get(
+userRoute.post(
   '/follow/:followed_user_id',
   accessTokenValidator,
   followUnfollowValidator,
