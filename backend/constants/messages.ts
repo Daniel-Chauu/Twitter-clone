@@ -91,15 +91,12 @@ const POST_MESSAGE = {
   USER_POST_GOT_SUCCESSFULLY: 'User posts got successfully'
 }
 
-const BOOKMARK_MESSAGE = {
-  BOOKMARK_SUCCESSFULLY: 'Bookmark successfully',
-  UNBOOKMARK_SUCCESSFULLY: 'Unbookmark successfully'
-} as const
-
-const LIKE_MESSAGE = {
-  LIKE_SUCCESSFULLY: 'Like successfully',
-  UNLIKE_SUCCESSFULLY: 'Unlike successfully',
-  YOU_HAVE_NOT_LIKE_THIS_POST: 'You have not like this post'
+const NOTIFICATION_MESSAGE = {
+  NOTIFICATIONS_GOT_SUCCESSFULLY: 'Notifications got successfully',
+  NOTIFICATIONS_DELETED_SUCCESSFULLY: 'Notifications deleted successfully',
+  NOTIFICATION_DELETED_SUCCESSFULLY: 'Notification deleted successfully',
+  NOTIFICATION_NOT_FOUND: 'Notification not found',
+  YOU_ARE_NOT_ALLOWED_TO_DELETE: 'You are not allowed to delete this notification'
 }
 
-export { AUTH_MESSAGE, USER_MESSAGE, POST_MESSAGE, BOOKMARK_MESSAGE, LIKE_MESSAGE }
+export { AUTH_MESSAGE, USER_MESSAGE, POST_MESSAGE, NOTIFICATION_MESSAGE }

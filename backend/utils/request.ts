@@ -35,3 +35,7 @@ export type PostCommentReqBody = {
 export type GetUserPostParams = {
   username: string
 }
+
+export type DeleteNotiParams = {
+  notification_id: string
+}

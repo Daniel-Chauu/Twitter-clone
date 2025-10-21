@@ -112,8 +112,8 @@ class PostService {
   async getAllPost() {
     const posts = await Post.find()
       .sort('-createdAt')
-      .populate({ path: 'user', select: '_id username' })
-      .populate('comments.user', '_id username')
+      .populate({ path: 'user', select: '_id username profileImg' })
+      .populate('comments.user', '_id username profileImg')
 
     return returnedData(true, POST_MESSAGE.ALL_POST_GOT_SUCCESSFULLY, {
       posts
@@ -129,8 +129,8 @@ class PostService {
       })
 
     const posts = await Post.find({ _id: { $in: user.likedPosts } })
-      .populate({ path: 'user', select: '_id username' })
-      .populate('comments.user', '_id username')
+      .populate({ path: 'user', select: '_id username profileImg' })
+      .populate('comments.user', '_id username profileImg')
 
     return returnedData(true, POST_MESSAGE.LIKED_POST_GOT_SUCCESSFULLY, {
       posts
@@ -146,8 +146,8 @@ class PostService {
 
     const posts = await Post.find({ user: { $in: user.following } })
       .sort({ createdAt: -1 })
-      .populate({ path: 'user', select: '_id username' })
-      .populate('comments.user', '_id username')
+      .populate({ path: 'user', select: '_id username profileImg' })
+      .populate('comments.user', '_id username profileImg')
 
     return returnedData(true, POST_MESSAGE.LIKED_POST_GOT_SUCCESSFULLY, {
       posts
@@ -163,8 +163,8 @@ class PostService {
 
     const posts = await Post.find({ user: user._id })
       .sort({ createdAt: -1 })
-      .populate({ path: 'user', select: '_id username' })
-      .populate('comments.user', '_id username')
+      .populate({ path: 'user', select: '_id username profileImg' })
+      .populate('comments.user', '_id username profileImg')
 
     return returnedData(true, POST_MESSAGE.USER_POST_GOT_SUCCESSFULLY, {
       posts
