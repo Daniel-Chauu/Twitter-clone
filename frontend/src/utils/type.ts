@@ -30,22 +30,14 @@ export type PostType =
       _id: string
       text: string
       img: string
-      user: {
-        username: string
-        profileImg: string
-        fullname: string
-      }
+      user: Pick<UserType, '_id' | 'fullname' | 'profileImg' | 'username'>
       comments: CommentType[]
       likes: string[]
     }
   | {
       _id: string
       text: string
-      user: {
-        username: string
-        profileImg: string
-        fullname: string
-      }
+      user: Pick<UserType, '_id' | 'fullname' | 'profileImg' | 'username'>
       comments: CommentType[]
       likes: string[]
       img?: string

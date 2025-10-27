@@ -31,19 +31,8 @@ const Sidebar = () => {
     }
   })
 
-  const { data } = useQuery({
+  const { data } = useQuery<SuccessResponse<GetProfileSuccessResponse>>({
     queryKey: ['authUser'],
-    queryFn: async () => {
-      try {
-        const res = await apiFetch<GetProfileSuccessResponse>('/api/auth/me', {
-          method: 'GET',
-          credentials: 'include'
-        })
-        return res
-      } catch (error) {
-        return null
-      }
-    },
     retry: false
   })
 

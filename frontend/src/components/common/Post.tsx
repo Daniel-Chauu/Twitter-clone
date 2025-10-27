@@ -3,20 +3,44 @@ import { BiRepost } from 'react-icons/bi'
 import { FaRegComment, FaRegHeart, FaTrash } from 'react-icons/fa'
 import { FaRegBookmark } from 'react-icons/fa6'
 import { Link } from 'react-router'
-import type { CommentType, PostType } from '../../utils/type'
+import type { CommentType, GetProfileSuccessResponse, PostType } from '../../utils/type'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { SuccessResponse } from '../../utils/errors'
+import { apiFetch } from '../../utils/apiFetch'
+import toast from 'react-hot-toast'
+import LoadingSpinner from './LoadingSpinner'
 
 const Post = ({ post }: { post: PostType }) => {
   const [comment, setComment] = useState('')
+
+  const queryClient = useQueryClient()
+
+  const { data } = useQuery<SuccessResponse<GetProfileSuccessResponse>>({ queryKey: ['authUser'] })
+
+  const deletePostMutation = useMutation({
+    mutationFn: async () =>
+      apiFetch(`api/posts/${post._id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      }),
+    onSuccess: (data) => {
+      toast(data.message)
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
+    }
+  })
+
   const postOwner = post.user
   const isLiked = false
 
-  const isMyPost = true
+  const isMyPost = data?.data?.user._id === postOwner._id
 
   const formattedDate = '1h'
 
   const isCommenting = false
 
-  const handleDeletePost = () => {}
+  const handleDeletePost = () => {
+    deletePostMutation.mutate()
+  }
 
   const handlePostComment = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -44,7 +68,10 @@ const Post = ({ post }: { post: PostType }) => {
             </span>
             {isMyPost && (
               <span className='flex justify-end flex-1'>
-                <FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />
+                {!deletePostMutation.isPending && (
+                  <FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />
+                )}
+                {deletePostMutation.isPending && <LoadingSpinner size='sm' />}
               </span>
             )}
           </div>

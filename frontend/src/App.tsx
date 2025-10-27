@@ -10,21 +10,11 @@ import { useQuery } from '@tanstack/react-query'
 import { apiFetch } from './utils/apiFetch'
 import LoadingSpinner from './components/common/LoadingSpinner'
 import type { GetProfileSuccessResponse } from './utils/type'
+import type { SuccessResponse } from './utils/errors'
 
 function App() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQuery<SuccessResponse<GetProfileSuccessResponse>>({
     queryKey: ['authUser'],
-    queryFn: async () => {
-      try {
-        const res = await apiFetch<GetProfileSuccessResponse>('/api/auth/me', {
-          method: 'GET',
-          credentials: 'include'
-        })
-        return res
-      } catch (error) {
-        return null
-      }
-    },
     retry: false
   })
 
