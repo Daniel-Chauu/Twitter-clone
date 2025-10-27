@@ -3,7 +3,7 @@ import { BiRepost } from 'react-icons/bi'
 import { FaRegComment, FaRegHeart, FaTrash } from 'react-icons/fa'
 import { FaRegBookmark } from 'react-icons/fa6'
 import { Link } from 'react-router'
-import type { PostType } from '../../utils/dummy'
+import type { CommentType, PostType } from '../../utils/type'
 
 const Post = ({ post }: { post: PostType }) => {
   const [comment, setComment] = useState('')
@@ -35,7 +35,7 @@ const Post = ({ post }: { post: PostType }) => {
         <div className='flex flex-col flex-1'>
           <div className='flex gap-2 items-center'>
             <Link to={`/profile/${postOwner.username}`} className='font-bold'>
-              {postOwner.fullName}
+              {postOwner.fullname}
             </Link>
             <span className='text-gray-700 flex gap-1 text-sm'>
               <Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
@@ -74,7 +74,7 @@ const Post = ({ post }: { post: PostType }) => {
                     {post.comments.length === 0 && (
                       <p className='text-sm text-slate-500'>No comments yet 🤔 Be the first one 😉</p>
                     )}
-                    {post.comments.map((comment) => (
+                    {post.comments.map((comment: CommentType) => (
                       <div key={comment._id} className='flex gap-2 items-start'>
                         <div className='avatar'>
                           <div className='w-8 rounded-full'>
@@ -83,7 +83,7 @@ const Post = ({ post }: { post: PostType }) => {
                         </div>
                         <div className='flex flex-col'>
                           <div className='flex items-center gap-1'>
-                            <span className='font-bold'>{comment.user.fullName}</span>
+                            <span className='font-bold'>{comment.user.fullname}</span>
                             <span className='text-gray-700 text-sm'>@{comment.user.username}</span>
                           </div>
                           <div className='text-sm'>{comment.text}</div>
