@@ -1,13 +1,12 @@
 import { Request } from 'express'
-import { checkSchema, ParamSchema, Schema } from 'express-validator'
+import { checkSchema, ParamSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { AUTH_MESSAGE } from '~/constants/messages'
 import { REGEX_EMAIL, REGEX_USERNAME } from '~/constants/regex'
 import { StatusError } from '~/errors/error'
-import { User } from '~/models/user.model'
 import authService from '~/services/auth.service'
-import { hashPassword } from '~/utils/bcrypt'
+import { comparePassword } from '~/utils/bcrypt'
 import { verifyToken } from '~/utils/jwt'
 import validate from '~/utils/validation'
 
@@ -78,24 +77,33 @@ export const signupValidator = validate(
 export const loginValidator = validate(
   checkSchema(
     {
-      email: {
+      username: {
         custom: {
           options: async (value: string, { req }) => {
-            if (!value) throw new Error(AUTH_MESSAGE.EMAIL_IS_REQUIRED)
-            const isValidEmail = REGEX_EMAIL.test(value)
-            if (!isValidEmail) throw new Error(AUTH_MESSAGE.EMAIL_IS_INVALID)
-            if (req.body.password) {
-              const user = await authService.findUser({ email: value }, { password: 0 })
+            if (!value) throw new Error(AUTH_MESSAGE.USER_NAME_IS_REQUIRED)
+            // const isValidEmail = REGEX_EMAIL.test(value)
 
-              if (user) {
-                ;(req as Request).user = user
-                return true
+            if (value.length < 4 || value.length > 50)
+              throw new Error(AUTH_MESSAGE.USERNAME_LENGTH_MUST_BE_FROM_4_TO_50)
+            if (req.body.password) {
+              const user = await authService.findUser({ username: value })
+
+              if (!user)
+                throw new StatusError({
+                  message: AUTH_MESSAGE.USERNAME_DOES_NOT_EXIST,
+                  status: HTTP_STATUS.NOT_FOUND
+                })
+
+              const isMatchPassword = await comparePassword(req.body.password, user.password)
+              if (!isMatchPassword) {
+                throw new StatusError({
+                  message: AUTH_MESSAGE.INCORRECT_PASSWORD,
+                  status: HTTP_STATUS.BAD_REQUEST
+                })
               }
 
-              throw new StatusError({
-                message: AUTH_MESSAGE.EMAIL_OR_PASSWORD_IS_INCORRECT,
-                status: HTTP_STATUS.NOT_FOUND
-              })
+              ;(req as Request).user = user
+              return true
             }
           }
         }
@@ -109,27 +117,28 @@ export const loginValidator = validate(
 export const accessTokenValidator = validate(
   checkSchema(
     {
-      Authorization: {
+      access_token: {
         custom: {
           options: async (token: string, { req }) => {
+            console.log('🚀 ~ token:', token)
             if (!token)
               throw new StatusError({
                 message: AUTH_MESSAGE.ACCESS_TOKEN_IS_REQUIRED,
                 status: HTTP_STATUS.UNAUTHORIZED
               })
 
-            const isBear = token.includes('Bear')
-            if (!isBear)
-              throw new StatusError({
-                message: AUTH_MESSAGE.ACCESS_TOKEN_IS_MALFORMED,
-                status: HTTP_STATUS.UNAUTHORIZED
-              })
+            // const isBear = token.includes('Bear')
+            // if (!isBear)
+            //   throw new StatusError({
+            //     message: AUTH_MESSAGE.ACCESS_TOKEN_IS_MALFORMED,
+            //     status: HTTP_STATUS.UNAUTHORIZED
+            //   })
 
-            const access_token = token.split(' ')[1]
+            // const access_token = token.split(' ')[1]
 
             try {
               const decoded_authorization = await verifyToken({
-                token: access_token,
+                token,
                 secretKey: process.env.JWT_ACCESS_TOKEN_SECRET_KEY as string
               })
 
@@ -149,6 +158,6 @@ export const accessTokenValidator = validate(
         }
       }
     },
-    ['headers']
+    ['cookies']
   )
 )

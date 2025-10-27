@@ -1,5 +1,6 @@
 const AUTH_MESSAGE = {
   VALIDATION_ERROR: 'Validation error',
+  INCORRECT_PASSWORD: 'Incorrect password',
   NAME_IS_REQUIRED: 'Name is required',
   NAME_MUST_BE_A_STRING: 'Name must be a string',
   NAME_LENGTH_MUST_BE_FROM_2_TO_100: 'Name length must be from 2 to 100 characters',
@@ -58,7 +59,8 @@ const AUTH_MESSAGE = {
   UPLOAD_IMAGE_IS_SUCCESSFULLY: 'Upload image is successfully',
   UPLOAD_VIDEO_IS_SUCCESSFULLY: 'Upload video is successfully',
   RANGE_IS_REQUIRED: 'Range is required',
-  LOGOUT_SUCCESS: 'Logout successfully'
+  LOGOUT_SUCCESS: 'Logout successfully',
+  USERNAME_DOES_NOT_EXIST: 'Username does not exist'
 } as const
 
 const USER_MESSAGE = {

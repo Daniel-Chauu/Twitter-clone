@@ -1,36 +1,67 @@
-import { Link } from 'react-router'
+import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
-import { MdOutlineMail } from 'react-icons/md'
+import toast from 'react-hot-toast'
 import { FaUser } from 'react-icons/fa'
-import { MdPassword } from 'react-icons/md'
-import { MdDriveFileRenameOutline } from 'react-icons/md'
+import { MdDriveFileRenameOutline, MdOutlineMail, MdPassword } from 'react-icons/md'
+import { Link, useNavigate } from 'react-router'
+import LoadingSpinner from '../../components/common/LoadingSpinner'
 import XSvg from '../../components/svgs/X'
+import { apiFetch } from '../../utils/apiFetch'
+import { ApiError, type SuccessResponse } from '../../utils/errors'
+import type { SignUpSucessResponse, UserType } from '../../utils/type'
 
 type SignUpDataForm = {
   email: string
   username: string
-  fullName: string
+  fullname: string
   password: string
 }
 
 const SignUp = () => {
+  const navigate = useNavigate()
+
   const [formData, setFormData] = useState<SignUpDataForm>({
     email: '',
     username: '',
-    fullName: '',
+    fullname: '',
     password: ''
   })
+
+  const { mutate, error, isPending } = useMutation({
+    mutationFn: async (body: SignUpDataForm) => {
+      return apiFetch<SignUpSucessResponse>('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      })
+    },
+    onSuccess: (data: SuccessResponse<SignUpSucessResponse>) => {
+      toast.success(data.message)
+      navigate('/')
+    },
+    onError: (error) => {
+      if (error instanceof ApiError && !error.isValidationError) toast.error(error.message)
+    }
+  })
+
+  const getErrorByField = (field: 'email' | 'username' | 'fullname' | 'password') => {
+    if (error instanceof ApiError && error.validationErrors) {
+      return error.validationErrors[field]?.msg
+    }
+    return null
+  }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     console.log(formData)
+    mutate(formData)
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
-
-  const isError = false
 
   return (
     <div className='max-w-7xl mx-auto flex h-screen px-10'>
@@ -41,7 +72,7 @@ const SignUp = () => {
         <form className='lg:w-2/3  mx-auto md:mx-20 flex gap-4 flex-col' onSubmit={handleSubmit}>
           <XSvg className='w-24 lg:hidden fill-white' />
           <h1 className='text-4xl font-extrabold text-white'>Join today.</h1>
-          <label className='input input-bordered rounded flex items-center gap-2'>
+          <label className='mb-3 input input-bordered rounded flex items-center gap-2'>
             <MdOutlineMail />
             <input
               type='email'
@@ -51,32 +82,50 @@ const SignUp = () => {
               onChange={handleInputChange}
               value={formData.email}
             />
+
+            {getErrorByField('email') && (
+              <p className='w-full text-ellipsis overflow-hidden absolute bottom-[-50%] left-0 text-xs text-red-500'>
+                {getErrorByField('email')}
+              </p>
+            )}
           </label>
-          <div className='flex gap-4 flex-wrap'>
-            <label className='input input-bordered rounded flex items-center gap-2 flex-1'>
-              <FaUser />
-              <input
-                type='text'
-                className='grow '
-                placeholder='Username'
-                name='username'
-                onChange={handleInputChange}
-                value={formData.username}
-              />
-            </label>
-            <label className='input input-bordered rounded flex items-center gap-2 flex-1'>
-              <MdDriveFileRenameOutline />
-              <input
-                type='text'
-                className='grow'
-                placeholder='Full Name'
-                name='fullName'
-                onChange={handleInputChange}
-                value={formData.fullName}
-              />
-            </label>
-          </div>
-          <label className='input input-bordered rounded flex items-center gap-2'>
+
+          <label className='mb-2 input input-bordered rounded flex items-center gap-2'>
+            <FaUser />
+            <input
+              type='text'
+              className='grow '
+              placeholder='Username'
+              name='username'
+              onChange={handleInputChange}
+              value={formData.username}
+            />
+
+            {getErrorByField('username') && (
+              <p className='w-full text-ellipsis overflow-hidden absolute bottom-[-50%] left-0 text-xs text-red-500'>
+                {getErrorByField('username')}
+              </p>
+            )}
+          </label>
+          <label className='mb-2 input input-bordered rounded flex items-center gap-2'>
+            <MdDriveFileRenameOutline />
+            <input
+              type='text'
+              className='grow'
+              placeholder='Full Name'
+              name='fullname'
+              onChange={handleInputChange}
+              value={formData.fullname}
+            />
+
+            {getErrorByField('fullname') && (
+              <p className='w-full text-ellipsis overflow-hidden absolute bottom-[-50%] left-0 text-xs text-red-500'>
+                {getErrorByField('fullname')}
+              </p>
+            )}
+          </label>
+
+          <label className='mb-2 input input-bordered rounded flex items-center gap-2'>
             <MdPassword />
             <input
               type='password'
@@ -86,9 +135,16 @@ const SignUp = () => {
               onChange={handleInputChange}
               value={formData.password}
             />
+
+            {getErrorByField('password') && (
+              <p className='w-full text-ellipsis overflow-hidden absolute bottom-[-50%] left-0 text-xs text-red-500'>
+                {getErrorByField('password')}
+              </p>
+            )}
           </label>
-          <button className='btn rounded-full btn-primary text-white'>Sign up</button>
-          {isError && <p className='text-red-500'>Something went wrong</p>}
+          <button className='btn rounded-full btn-primary text-white' disabled={isPending}>
+            {isPending ? <LoadingSpinner size='sm' /> : 'Sign up'}
+          </button>
         </form>
         <div className='flex flex-col lg:w-2/3 gap-2 mt-4'>
           <p className='text-white text-lg'>Already have an account?</p>
@@ -100,4 +156,5 @@ const SignUp = () => {
     </div>
   )
 }
+
 export default SignUp

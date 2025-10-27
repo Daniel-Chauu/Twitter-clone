@@ -11,6 +11,7 @@ import { omit } from '~/utils/utils'
 const authController = {
   signup: async (req: Request<any, any, SignupReqBody>, res: Response) => {
     const body = req.body
+    console.log('🚀 ~ body:', body)
 
     const response = await authService.signup(body)
 
@@ -23,11 +24,22 @@ const authController = {
 
     const response = await authService.login(user._id)
 
+    setCookie({ name: 'access_token', value: response?.data.access_token, res })
+
     res.status(HTTP_STATUS.OK).json({
       ...response,
       data: {
         access_token: response.data.access_token,
-        user
+        user: {
+          _id: user._id,
+          fullname: user.fullname,
+          username: user.username,
+          email: user.email,
+          followers: user.followers,
+          following: user.following,
+          profileImg: user.profileImg,
+          coverImg: user.coverImg
+        }
       }
     })
   },

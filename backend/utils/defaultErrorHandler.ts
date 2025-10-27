@@ -7,7 +7,7 @@ import { logError, omit } from '~/utils/utils'
 export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   logError(err, req)
   if (err instanceof StatusError) {
-    res.status(err.status).json(err)
+    res.status(err.status).json(omit(err, 'status'))
     return
   }
 

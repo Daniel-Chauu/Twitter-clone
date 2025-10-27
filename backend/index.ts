@@ -1,10 +1,10 @@
-import bodyParser from 'body-parser'
 import cors from 'cors'
 import 'dotenv/config'
 import express from 'express'
 import connectMongoDB from './db/connectMongoDB'
 import rootRoute from './routes/root.route'
 import cloudinaryConfig from './utils/cloudinary'
+import cookieParser from 'cookie-parser'
 
 cloudinaryConfig()
 
@@ -13,7 +13,7 @@ const PORT = process.env.PORT
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(cookieParser())
 app.use(cors())
 
 app.use('/api', rootRoute)
