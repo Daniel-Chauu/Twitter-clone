@@ -1,10 +1,24 @@
 import { Link } from 'react-router'
 
+import { useQuery } from '@tanstack/react-query'
+import { apiFetch } from '../../utils/apiFetch'
+import type { GetSuggestedUserSuccessReponse } from '../../utils/type'
 import RightPanelSkeleton from '../skeletons/RightPanelSkeleton'
-import { USERS_FOR_RIGHT_PANEL } from '../../utils/dummy'
 
 const RightPanel = () => {
-  const isLoading = false
+  const { data, isLoading } = useQuery({
+    queryKey: ['suggestedUsers'],
+    queryFn: () =>
+      apiFetch<GetSuggestedUserSuccessReponse>('/api/users/suggested', {
+        method: 'GET'
+      })
+  })
+
+  const suggestedUsers = data?.data?.suggested
+
+  if (suggestedUsers?.length === 0) {
+    return <div className='md-w-64 w-0'></div>
+  }
 
   return (
     <div className='hidden lg:block my-4 mx-2'>
@@ -21,7 +35,7 @@ const RightPanel = () => {
             </>
           )}
           {!isLoading &&
-            USERS_FOR_RIGHT_PANEL?.map((user) => (
+            suggestedUsers?.map((user) => (
               <Link to={`/profile/${user.username}`} className='flex items-center justify-between gap-4' key={user._id}>
                 <div className='flex gap-2 items-center'>
                   <div className='avatar'>
@@ -30,7 +44,7 @@ const RightPanel = () => {
                     </div>
                   </div>
                   <div className='flex flex-col'>
-                    <span className='font-semibold tracking-tight truncate w-28'>{user.fullName}</span>
+                    <span className='font-semibold tracking-tight truncate w-28'>{user.fullname}</span>
                     <span className='text-sm text-slate-500'>@{user.username}</span>
                   </div>
                 </div>

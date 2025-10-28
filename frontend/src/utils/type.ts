@@ -60,3 +60,7 @@ export type GetProfileSuccessResponse = {
 export type GetPostsSuccessReponse = {
   posts: PostType[]
 }
+
+export type GetSuggestedUserSuccessReponse = {
+  suggested: UserType[]
+}

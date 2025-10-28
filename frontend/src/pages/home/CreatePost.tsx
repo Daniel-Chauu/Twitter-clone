@@ -5,6 +5,8 @@ import { IoCloseSharp } from 'react-icons/io5'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiFetch } from '../../utils/apiFetch'
 import toast from 'react-hot-toast'
+import type { GetProfileSuccessResponse } from '../../utils/type'
+import type { SuccessResponse } from '../../utils/errors'
 
 const CreatePost = () => {
   const [text, setText] = useState<string>('')
@@ -14,7 +16,7 @@ const CreatePost = () => {
 
   const imgRef = useRef<HTMLInputElement | null>(null)
 
-  const { data: authUser } = useQuery({ queryKey: ['authUser'] })
+  const { data: authUser } = useQuery<SuccessResponse<GetProfileSuccessResponse>>({ queryKey: ['authUser'] })
 
   const { mutate, isPending, isError } = useMutation({
     mutationFn: async (body: { img: string | null; text: string }) =>
@@ -33,10 +35,6 @@ const CreatePost = () => {
       toast.success(data.message)
     }
   })
-
-  const data = {
-    profileImg: '/avatars/boy1.png'
-  }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -61,7 +59,7 @@ const CreatePost = () => {
     <div className='flex p-4 items-start gap-4 border-b border-gray-700'>
       <div className='avatar'>
         <div className='w-8 rounded-full'>
-          <img src={data.profileImg || '/avatar-placeholder.png'} />
+          <img src={authUser?.data?.user.profileImg || '/avatar-placeholder.png'} />
         </div>
       </div>
       <form className='flex flex-col gap-2 w-full' onSubmit={handleSubmit}>

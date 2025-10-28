@@ -65,7 +65,6 @@ class UserService {
   }
 
   async getSuggestedUser(user_id: string) {
-    console.log('🚀 ~ user_id:', user_id)
     const usersFollowedByMe = await User.findById(user_id).select('following')
 
     const users: IUser[] = await User.aggregate([
