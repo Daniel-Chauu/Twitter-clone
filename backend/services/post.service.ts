@@ -60,6 +60,7 @@ class PostService {
 
   async comment({ post_id, user_id, text }: { post_id: string; user_id: string; text: string }) {
     const post = await Post.findById(post_id)
+
     if (!post)
       throw new StatusError({
         message: POST_MESSAGE.POST_NOT_FOUND_OR_ALREADY_DELETED,
@@ -71,11 +72,13 @@ class PostService {
       text
     }
 
-    post.comments?.push(comment)
-    await post.save()
+    const updatedPost = await Post.findOneAndUpdate({ _id: post_id }, { $push: { comments: comment } }, { new: true })
+      .populate({ path: 'user', select: '_id username profileImg fullname' })
+      .populate('comments.user', '_id username profileImg fullname')
 
-    return returnedData(true, POST_MESSAGE.COMMENT_SUCCESSFULLY, { post })
+    return returnedData(true, POST_MESSAGE.COMMENT_SUCCESSFULLY, { post: updatedPost })
   }
+
   async likeUnlike({ post_id, user_id }: { post_id: string; user_id: string }) {
     const post = await Post.findById(post_id)
     if (!post)

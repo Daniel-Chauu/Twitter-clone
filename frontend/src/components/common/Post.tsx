@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BiRepost } from 'react-icons/bi'
 import { FaRegComment, FaRegHeart, FaTrash } from 'react-icons/fa'
 import { FaRegBookmark } from 'react-icons/fa6'
 import { Link } from 'react-router'
 import type {
+  CommentSuccessResponse,
   CommentType,
   GetPostsSuccessReponse,
   GetProfileSuccessResponse,
@@ -15,13 +16,22 @@ import type { SuccessResponse } from '../../utils/errors'
 import { apiFetch } from '../../utils/apiFetch'
 import toast from 'react-hot-toast'
 import LoadingSpinner from './LoadingSpinner'
+import { formatPostDate } from '../../utils/date'
 
 const Post = ({ post }: { post: PostType }) => {
   const [comment, setComment] = useState('')
+  const commentsContainerRef = useRef<HTMLDivElement>(null)
 
   const queryClient = useQueryClient()
 
   const { data: authUser } = useQuery<SuccessResponse<GetProfileSuccessResponse>>({ queryKey: ['authUser'] })
+
+  const postOwner = post.user
+  const isLiked = post.likes.includes(authUser?.data?.user._id as string)
+
+  const isMyPost = authUser?.data?.user._id === post.user._id
+
+  const formattedDate = formatPostDate(post.createdAt)
 
   const deletePostMutation = useMutation({
     mutationFn: async () =>
@@ -70,14 +80,44 @@ const Post = ({ post }: { post: PostType }) => {
     }
   })
 
-  const postOwner = post.user
-  const isLiked = post.likes.includes(authUser?.data?.user._id as string)
+  const commentMutation = useMutation({
+    mutationFn: async (body: { text: string }) => {
+      return apiFetch<CommentSuccessResponse>(`/api/posts/comment/${post._id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      })
+    },
+    onSuccess: (data) => {
+      toast.success(data.message)
+      setComment('')
+      queryClient.setQueryData(['posts'], (oldData: SuccessResponse<GetPostsSuccessReponse>) => {
+        const updatedPosts = oldData.data?.posts.map((p) => {
+          if (p._id === post._id) {
+            return {
+              ...p,
+              comments: data.data?.post.comments
+            }
+          }
+          return p
+        })
 
-  const isMyPost = authUser?.data?.user._id === post.user._id
+        return {
+          ...oldData,
+          data: {
+            posts: updatedPosts
+          }
+        }
+      })
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    }
+  })
 
-  const formattedDate = '1h'
-
-  const isCommenting = false
+  const isCommenting = commentMutation.isPending
 
   const handleDeletePost = () => {
     deletePostMutation.mutate()
@@ -85,12 +125,19 @@ const Post = ({ post }: { post: PostType }) => {
 
   const handlePostComment = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    commentMutation.mutate({ text: comment })
   }
 
   const handleLikePost = () => {
     if (likeMutation.isPending) return
     likeMutation.mutate()
   }
+
+  useEffect(() => {
+    if (commentsContainerRef.current) {
+      commentsContainerRef.current.scrollTop = commentsContainerRef.current.scrollHeight
+    }
+  }, [post.comments])
 
   return (
     <>
@@ -141,7 +188,7 @@ const Post = ({ post }: { post: PostType }) => {
               <dialog id={`comments_modal${post._id}`} className='modal border-none outline-none'>
                 <div className='modal-box rounded border border-gray-600'>
                   <h3 className='font-bold text-lg mb-4'>COMMENTS</h3>
-                  <div className='flex flex-col gap-3 max-h-60 overflow-auto'>
+                  <div className='flex flex-col gap-3 max-h-60 overflow-auto' ref={commentsContainerRef}>
                     {post.comments.length === 0 && (
                       <p className='text-sm text-slate-500'>No comments yet 🤔 Be the first one 😉</p>
                     )}

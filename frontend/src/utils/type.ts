@@ -33,6 +33,7 @@ export type PostType =
       user: Pick<UserType, '_id' | 'fullname' | 'profileImg' | 'username'>
       comments: CommentType[]
       likes: string[]
+      createdAt: Date
     }
   | {
       _id: string
@@ -41,6 +42,7 @@ export type PostType =
       comments: CommentType[]
       likes: string[]
       img?: string
+      createdAt: Date
     }
 
 export type LoginSucessResponse = {
@@ -67,4 +69,8 @@ export type GetSuggestedUserSuccessReponse = {
 
 export type LikeSuccessResponse = {
   updatedLikes: string[]
+}
+
+export type CommentSuccessResponse = {
+  post: PostType
 }
