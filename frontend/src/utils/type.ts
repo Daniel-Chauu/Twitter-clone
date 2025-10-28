@@ -45,6 +45,21 @@ export type PostType =
       createdAt: Date
     }
 
+export type Notification = {
+  _id: string
+  from: {
+    _id: string
+    username: string
+    profileImg: string
+  }
+  to: string
+  type: string
+  read: boolean
+  createdAt: string
+  updatedAt: string
+  __v: number
+}
+
 export type LoginSucessResponse = {
   access_token: string
   user: UserType
@@ -73,4 +88,8 @@ export type LikeSuccessResponse = {
 
 export type CommentSuccessResponse = {
   post: PostType
+}
+
+export type GetNotificationsSuccessResponse = {
+  notifications: Notification[]
 }

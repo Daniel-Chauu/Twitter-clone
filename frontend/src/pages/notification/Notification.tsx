@@ -4,32 +4,32 @@ import { IoSettingsOutline } from 'react-icons/io5'
 import { FaUser } from 'react-icons/fa'
 import { FaHeart } from 'react-icons/fa6'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { apiFetch } from '../../utils/apiFetch'
+import type { GetNotificationsSuccessResponse } from '../../utils/type'
+import toast from 'react-hot-toast'
 
 const Notification = () => {
-  const isLoading = false
-  const notifications = [
-    {
-      _id: '1',
-      from: {
-        _id: '1',
-        username: 'johndoe',
-        profileImg: '/avatars/boy2.png'
-      },
-      type: 'follow'
+  const queryClient = useQueryClient()
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => apiFetch<GetNotificationsSuccessResponse>('/api/notifications')
+  })
+
+  const notifications = data?.data?.notifications
+
+  const { mutate } = useMutation({
+    mutationFn: () => apiFetch('/api/notifications', { method: 'DELETE' }),
+    onSuccess: (data) => {
+      toast.success(data.message)
     },
-    {
-      _id: '2',
-      from: {
-        _id: '2',
-        username: 'janedoe',
-        profileImg: '/avatars/girl1.png'
-      },
-      type: 'like'
-    }
-  ]
+    onError: (error) => toast.error(error.message)
+  })
 
   const deleteNotifications = () => {
-    alert('All notifications deleted')
+    mutate()
+    queryClient.invalidateQueries({ queryKey: ['notifications'] })
   }
 
   return (
