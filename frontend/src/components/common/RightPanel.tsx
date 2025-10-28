@@ -4,6 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { apiFetch } from '../../utils/apiFetch'
 import type { GetSuggestedUserSuccessReponse } from '../../utils/type'
 import RightPanelSkeleton from '../skeletons/RightPanelSkeleton'
+import useFollow from '../../hooks/useFollow'
+import LoadingSpinner from './LoadingSpinner'
 
 const RightPanel = () => {
   const { data, isLoading } = useQuery({
@@ -13,6 +15,8 @@ const RightPanel = () => {
         method: 'GET'
       })
   })
+
+  const { follow, isPending, variables } = useFollow()
 
   const suggestedUsers = data?.data?.suggested
 
@@ -51,9 +55,12 @@ const RightPanel = () => {
                 <div>
                   <button
                     className='btn bg-white text-black hover:bg-white hover:opacity-90 rounded-full btn-sm'
-                    onClick={(e) => e.preventDefault()}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      follow(user._id)
+                    }}
                   >
-                    Follow
+                    {isPending && variables === user._id ? <LoadingSpinner size='sm' /> : 'Follow'}
                   </button>
                 </div>
               </Link>

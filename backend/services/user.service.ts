@@ -37,7 +37,6 @@ class UserService {
       })
 
     const isFollowing = currrent_user.following?.includes(new mongoose.Types.ObjectId(followed_user_id))
-    console.log('🚀 ~ isFollowing:', isFollowing)
 
     if (isFollowing) {
       // Unfollow user

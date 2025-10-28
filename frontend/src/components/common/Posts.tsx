@@ -6,17 +6,21 @@ import PostSkeleton from '../skeletons/PostSkeleton'
 import Post from './Post'
 import { useEffect } from 'react'
 
-const Posts = ({ feedType }: { feedType: 'following' | 'forYou' }) => {
-  const getPostEndPoint = (feedType: 'following' | 'forYou') => {
+export type FeedType = 'following' | 'forYou' | 'posts' | 'likes'
+
+const Posts = ({ feedType, userId, username }: { feedType: FeedType; username?: string; userId?: string }) => {
+  const getPostEndPoint = (feedType: FeedType) => {
     switch (feedType) {
-      case 'forYou': {
-        return 'api/posts'
-      }
-      case 'following': {
-        return 'api/posts/following'
-      }
+      case 'forYou':
+        return '/api/posts'
+      case 'following':
+        return '/api/posts/following'
+      case 'posts':
+        return `/api/posts/user/${username}`
+      case 'likes':
+        return `/api/posts/likes/${userId}`
       default:
-        return 'api/posts'
+        return '/api/posts/all'
     }
   }
 

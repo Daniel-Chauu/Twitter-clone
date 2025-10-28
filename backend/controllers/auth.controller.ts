@@ -11,7 +11,6 @@ import { omit } from '~/utils/utils'
 const authController = {
   signup: async (req: Request<any, any, SignupReqBody>, res: Response) => {
     const body = req.body
-    console.log('🚀 ~ body:', body)
 
     const response = await authService.signup(body)
 

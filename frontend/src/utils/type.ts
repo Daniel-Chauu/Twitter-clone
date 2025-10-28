@@ -3,13 +3,13 @@ export type UserType = {
   fullname: string
   password: string
   email: string
-  followers: never[]
-  following: never[]
+  followers: string[] | null
+  following: string[] | null
   profileImg: string
   coverImg: string
   bio: string
   link: string
-  likedPosts: never[]
+  likedPosts: string[] | null
   _id: string
   createdAt: string
   updatedAt: string

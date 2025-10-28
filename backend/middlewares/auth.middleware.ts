@@ -120,7 +120,6 @@ export const accessTokenValidator = validate(
       access_token: {
         custom: {
           options: async (token: string, { req }) => {
-            console.log('🚀 ~ token:', token)
             if (!token)
               throw new StatusError({
                 message: AUTH_MESSAGE.ACCESS_TOKEN_IS_REQUIRED,

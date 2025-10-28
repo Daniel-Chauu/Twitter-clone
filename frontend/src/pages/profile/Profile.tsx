@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { Link } from 'react-router'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useParams } from 'react-router'
 
 import { FaArrowLeft } from 'react-icons/fa6'
 import { IoCalendarOutline } from 'react-icons/io5'
@@ -8,30 +8,35 @@ import { MdEdit } from 'react-icons/md'
 import ProfileHeaderSkeleton from '../../components/skeletons/ProfileHeaderSkeleton'
 import { POSTS } from '../../utils/dummy'
 import EditProfileModal from './EditProfileModal'
-import Posts from '../../components/common/Posts'
+import Posts, { type FeedType } from '../../components/common/Posts'
+import { useQuery } from '@tanstack/react-query'
+import { apiFetch } from '../../utils/apiFetch'
+import type { GetProfileSuccessResponse } from '../../utils/type'
+import type { SuccessResponse } from '../../utils/errors'
+import useFollow from '../../hooks/useFollow'
+import LoadingSpinner from '../../components/common/LoadingSpinner'
 
 const Profile = () => {
   const [coverImg, setCoverImg] = useState<string | null>(null)
   const [profileImg, setProfileImg] = useState<string | null>(null)
-  const [feedType, setFeedType] = useState('posts')
+  const [feedType, setFeedType] = useState<FeedType>('posts')
 
   const coverImgRef = useRef<HTMLInputElement | null>(null)
   const profileImgRef = useRef<HTMLInputElement | null>(null)
 
-  const isLoading = false
-  const isMyProfile = true
+  const { username } = useParams()
 
-  const user = {
-    _id: '1',
-    fullName: 'John Doe',
-    username: 'johndoe',
-    profileImg: '/avatars/boy2.png',
-    coverImg: '/cover.png',
-    bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    link: 'https://youtube.com/@asaprogrammer_',
-    following: ['1', '2', '3'],
-    followers: ['1', '2', '3']
-  }
+  const { follow, isPending } = useFollow()
+  const { data: authUser } = useQuery<SuccessResponse<GetProfileSuccessResponse>>({ queryKey: ['authUser'] })
+
+  const { data, refetch, isLoading, isRefetching } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: async () => apiFetch<GetProfileSuccessResponse>(`/api/users/profile/${username}`)
+  })
+
+  const isMyProfile = authUser?.data?.user._id === data?.data?.user._id
+
+  const user = data?.data?.user
 
   const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>, state: 'coverImg' | 'profileImg') => {
     let file
@@ -46,11 +51,17 @@ const Profile = () => {
     }
   }
 
+  const amIFollowing = authUser?.data?.user?.following?.includes(user?._id as string)
+
+  useEffect(() => {
+    refetch()
+  }, [username, refetch])
+
   return (
     <>
       <div className='flex-[4_4_0]  border-r border-gray-700 min-h-screen '>
         {/* HEADER */}
-        {isLoading && <ProfileHeaderSkeleton />}
+        {(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
         {!isLoading && !user && <p className='text-center text-lg mt-4'>User not found</p>}
         <div className='flex flex-col'>
           {!isLoading && user && (
@@ -60,7 +71,7 @@ const Profile = () => {
                   <FaArrowLeft className='w-4 h-4' />
                 </Link>
                 <div className='flex flex-col'>
-                  <p className='font-bold text-lg'>{user?.fullName}</p>
+                  <p className='font-bold text-lg'>{user?.fullname}</p>
                   <span className='text-sm text-slate-500'>{POSTS?.length} posts</span>
                 </div>
               </div>
@@ -118,9 +129,13 @@ const Profile = () => {
                 {!isMyProfile && (
                   <button
                     className='btn btn-outline rounded-full btn-sm'
-                    onClick={() => alert('Followed successfully')}
+                    onClick={() => {
+                      follow(user._id)
+                    }}
                   >
-                    Follow
+                    {isPending && 'Loading...'}
+                    {!isPending && amIFollowing && 'Unfollow'}
+                    {!isPending && !amIFollowing && 'Follow'}
                   </button>
                 )}
                 {(coverImg || profileImg) && (
@@ -135,7 +150,7 @@ const Profile = () => {
 
               <div className='flex flex-col gap-4 mt-14 px-4'>
                 <div className='flex flex-col'>
-                  <span className='font-bold text-lg'>{user?.fullName}</span>
+                  <span className='font-bold text-lg'>{user?.fullname}</span>
                   <span className='text-sm text-slate-500'>@{user?.username}</span>
                   <span className='text-sm my-1'>{user?.bio}</span>
                 </div>
@@ -163,11 +178,11 @@ const Profile = () => {
                 </div>
                 <div className='flex gap-2'>
                   <div className='flex gap-1 items-center'>
-                    <span className='font-bold text-xs'>{user?.following.length}</span>
+                    <span className='font-bold text-xs'>{user?.following?.length}</span>
                     <span className='text-slate-500 text-xs'>Following</span>
                   </div>
                   <div className='flex gap-1 items-center'>
-                    <span className='font-bold text-xs'>{user?.followers.length}</span>
+                    <span className='font-bold text-xs'>{user?.followers?.length}</span>
                     <span className='text-slate-500 text-xs'>Followers</span>
                   </div>
                 </div>
@@ -191,7 +206,7 @@ const Profile = () => {
             </>
           )}
 
-          <Posts />
+          <Posts feedType={'forYou'} />
         </div>
       </div>
     </>

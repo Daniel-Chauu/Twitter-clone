@@ -15,9 +15,8 @@ const userController = {
   },
   followUnfollowUser: async (req: Request<FollowUnfollowParams>, res: Response) => {
     const { followed_user_id } = req.params
-    console.log('🚀 ~ followed_user_id:', typeof followed_user_id)
+
     const { user_id } = req.decoded_authorization as TokenPayload
-    console.log('🚀 ~ user_id:', user_id)
 
     const response = await userService.followUnfollowUser({ followed_user_id, user_id })
 

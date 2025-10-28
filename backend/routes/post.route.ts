@@ -6,20 +6,26 @@ import { wrapRequestHandler } from '~/utils/handler'
 
 const postRoute = Router()
 
-postRoute.get('/', accessTokenValidator, postController.getAllPost)
+postRoute.get('/', accessTokenValidator, wrapRequestHandler(postController.getAllPost))
 
-postRoute.get('/likes', accessTokenValidator, postController.getLikedPost)
+postRoute.get('/likes', accessTokenValidator, wrapRequestHandler(postController.getLikedPost))
 
-postRoute.get('/following', accessTokenValidator, postController.getFollowingPost)
+postRoute.get('/following', accessTokenValidator, wrapRequestHandler(postController.getFollowingPost))
 
-postRoute.get('/user/:username', accessTokenValidator, postController.getUserPost)
+postRoute.get('/user/:username', accessTokenValidator, wrapRequestHandler(postController.getUserPost))
 
-postRoute.post('/create', accessTokenValidator, createPostValidator, postController.createPost)
+postRoute.post('/create', accessTokenValidator, createPostValidator, wrapRequestHandler(postController.createPost))
 
-postRoute.post('/like/:post_id', accessTokenValidator, postIdValidator, postController.likeUnlike)
+postRoute.post('/like/:post_id', accessTokenValidator, postIdValidator, wrapRequestHandler(postController.likeUnlike))
 
 postRoute.delete('/:post_id', accessTokenValidator, postIdValidator, wrapRequestHandler(postController.deletePost))
 
-postRoute.post('/comment/:post_id', accessTokenValidator, postIdValidator, postCommentValidator, postController.comment)
+postRoute.post(
+  '/comment/:post_id',
+  accessTokenValidator,
+  postIdValidator,
+  postCommentValidator,
+  wrapRequestHandler(postController.comment)
+)
 
 export default postRoute
