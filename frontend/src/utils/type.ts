@@ -64,3 +64,7 @@ export type GetPostsSuccessReponse = {
 export type GetSuggestedUserSuccessReponse = {
   suggested: UserType[]
 }
+
+export type LikeSuccessResponse = {
+  updatedLikes: string[]
+}

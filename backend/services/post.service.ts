@@ -57,6 +57,7 @@ class PostService {
 
     return returnedData(true, POST_MESSAGE.POST_DELETED_SUCCESSFULLY, { deleted_post: post })
   }
+
   async comment({ post_id, user_id, text }: { post_id: string; user_id: string; text: string }) {
     const post = await Post.findById(post_id)
     if (!post)
@@ -92,7 +93,10 @@ class PostService {
       await Post.updateOne({ _id: post_id }, { $pull: { likes: userId } })
       await User.updateOne({ _id: userId }, { $pull: { likedPosts: post_id } })
 
-      return returnedData(true, POST_MESSAGE.POST_UNLIKED_SUCCESSFULLY)
+      const updatedLikes = post.likes?.filter((id) => id.toString() !== userId.toString())
+      return returnedData(true, POST_MESSAGE.POST_UNLIKED_SUCCESSFULLY, {
+        updatedLikes
+      })
     } else {
       // Like post
       await post.likes?.push(userId)
@@ -105,7 +109,9 @@ class PostService {
         type: 'like'
       })
       await notification.save()
-      return returnedData(true, POST_MESSAGE.POST_LIKED_SUCCESSFULLY)
+
+      const updatedLikes = post.likes
+      return returnedData(true, POST_MESSAGE.POST_LIKED_SUCCESSFULLY, { updatedLikes })
     }
   }
 
@@ -136,6 +142,7 @@ class PostService {
       posts
     })
   }
+
   async getFollowingPost(user_id: string) {
     const user = await User.findById(user_id)
     if (!user)
@@ -153,6 +160,7 @@ class PostService {
       posts
     })
   }
+
   async getUserPost(username: string) {
     const user = await User.findOne({ username })
     if (!user)

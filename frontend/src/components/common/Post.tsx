@@ -3,7 +3,13 @@ import { BiRepost } from 'react-icons/bi'
 import { FaRegComment, FaRegHeart, FaTrash } from 'react-icons/fa'
 import { FaRegBookmark } from 'react-icons/fa6'
 import { Link } from 'react-router'
-import type { CommentType, GetProfileSuccessResponse, PostType } from '../../utils/type'
+import type {
+  CommentType,
+  GetPostsSuccessReponse,
+  GetProfileSuccessResponse,
+  LikeSuccessResponse,
+  PostType
+} from '../../utils/type'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { SuccessResponse } from '../../utils/errors'
 import { apiFetch } from '../../utils/apiFetch'
@@ -15,7 +21,7 @@ const Post = ({ post }: { post: PostType }) => {
 
   const queryClient = useQueryClient()
 
-  const { data } = useQuery<SuccessResponse<GetProfileSuccessResponse>>({ queryKey: ['authUser'] })
+  const { data: authUser } = useQuery<SuccessResponse<GetProfileSuccessResponse>>({ queryKey: ['authUser'] })
 
   const deletePostMutation = useMutation({
     mutationFn: async () =>
@@ -24,15 +30,50 @@ const Post = ({ post }: { post: PostType }) => {
         credentials: 'include'
       }),
     onSuccess: (data) => {
-      toast(data.message)
+      toast.success(data.message)
       queryClient.invalidateQueries({ queryKey: ['posts'] })
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    }
+  })
+
+  const likeMutation = useMutation({
+    mutationFn: async () =>
+      apiFetch<LikeSuccessResponse>(`api/posts/like/${post._id}`, {
+        method: 'POST',
+        credentials: 'include'
+      }),
+    onSuccess: (data) => {
+      toast.success(data.message)
+      queryClient.setQueryData(['posts'], (oldData: SuccessResponse<GetPostsSuccessReponse>) => {
+        const updatedPosts = oldData.data?.posts.map((p) => {
+          if (p._id === post._id) {
+            return {
+              ...p,
+              likes: data.data?.updatedLikes
+            }
+          }
+          return p
+        })
+
+        return {
+          ...oldData,
+          data: {
+            posts: updatedPosts
+          }
+        }
+      })
+    },
+    onError: (error) => {
+      toast.error(error.message)
     }
   })
 
   const postOwner = post.user
-  const isLiked = false
+  const isLiked = post.likes.includes(authUser?.data?.user._id as string)
 
-  const isMyPost = data?.data?.user._id === postOwner._id
+  const isMyPost = authUser?.data?.user._id === post.user._id
 
   const formattedDate = '1h'
 
@@ -46,7 +87,10 @@ const Post = ({ post }: { post: PostType }) => {
     e.preventDefault()
   }
 
-  const handleLikePost = () => {}
+  const handleLikePost = () => {
+    if (likeMutation.isPending) return
+    likeMutation.mutate()
+  }
 
   return (
     <>
@@ -129,7 +173,7 @@ const Post = ({ post }: { post: PostType }) => {
                       onChange={(e) => setComment(e.target.value)}
                     />
                     <button className='btn btn-primary rounded-full btn-sm text-white px-4'>
-                      {isCommenting ? <span className='loading loading-spinner loading-md'></span> : 'Post'}
+                      {isCommenting ? <LoadingSpinner size='sm' /> : 'Post'}
                     </button>
                   </form>
                 </div>
@@ -142,8 +186,13 @@ const Post = ({ post }: { post: PostType }) => {
                 <span className='text-sm text-slate-500 group-hover:text-green-500'>0</span>
               </div>
               <div className='flex gap-1 items-center group cursor-pointer' onClick={handleLikePost}>
-                {!isLiked && <FaRegHeart className='w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500' />}
-                {isLiked && <FaRegHeart className='w-4 h-4 cursor-pointer text-pink-500 ' />}
+                {/* {!isLiked && <FaRegHeart className='w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500' />} */}
+                {likeMutation.isPending && <LoadingSpinner size='sm' />}
+                {!isLiked && !likeMutation.isPending && (
+                  <FaRegHeart className='w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500' />
+                )}
+
+                {isLiked && !likeMutation.isPending && <FaRegHeart className='w-4 h-4 cursor-pointer text-pink-500 ' />}
 
                 <span className={`text-sm text-slate-500 group-hover:text-pink-500 ${isLiked ? 'text-pink-500' : ''}`}>
                   {post.likes.length}
