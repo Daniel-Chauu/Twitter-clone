@@ -8,13 +8,13 @@ const postRoute = Router()
 
 postRoute.get('/', accessTokenValidator, wrapRequestHandler(postController.getAllPost))
 
-postRoute.get('/likes', accessTokenValidator, wrapRequestHandler(postController.getLikedPost))
-
 postRoute.get('/following', accessTokenValidator, wrapRequestHandler(postController.getFollowingPost))
 
 postRoute.get('/user/:username', accessTokenValidator, wrapRequestHandler(postController.getUserPost))
 
 postRoute.post('/create', accessTokenValidator, createPostValidator, wrapRequestHandler(postController.createPost))
+
+postRoute.get('/likes/:user_id', accessTokenValidator, wrapRequestHandler(postController.getLikedPost))
 
 postRoute.post('/like/:post_id', accessTokenValidator, postIdValidator, wrapRequestHandler(postController.likeUnlike))
 

@@ -56,7 +56,7 @@ const postController = {
     res.status(HTTP_STATUS.OK).json(response)
   },
   getLikedPost: async (req: Request, res: Response) => {
-    const user_id = req.decoded_authorization?.user_id as string
+    const { user_id } = req.params
 
     const response = await postService.getLikedPost(user_id)
 

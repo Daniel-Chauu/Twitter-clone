@@ -1,20 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 
+import { useQuery } from '@tanstack/react-query'
+import { FaLink } from 'react-icons/fa'
 import { FaArrowLeft } from 'react-icons/fa6'
 import { IoCalendarOutline } from 'react-icons/io5'
-import { FaLink } from 'react-icons/fa'
 import { MdEdit } from 'react-icons/md'
-import ProfileHeaderSkeleton from '../../components/skeletons/ProfileHeaderSkeleton'
-import { POSTS } from '../../utils/dummy'
-import EditProfileModal from './EditProfileModal'
 import Posts, { type FeedType } from '../../components/common/Posts'
-import { useQuery } from '@tanstack/react-query'
-import { apiFetch } from '../../utils/apiFetch'
-import type { GetProfileSuccessResponse } from '../../utils/type'
-import type { SuccessResponse } from '../../utils/errors'
+import ProfileHeaderSkeleton from '../../components/skeletons/ProfileHeaderSkeleton'
 import useFollow from '../../hooks/useFollow'
-import LoadingSpinner from '../../components/common/LoadingSpinner'
+import { apiFetch } from '../../utils/apiFetch'
+import { formatMemberSinceDate } from '../../utils/date'
+import { POSTS } from '../../utils/dummy'
+import type { SuccessResponse } from '../../utils/errors'
+import type { GetProfileSuccessResponse } from '../../utils/type'
+import EditProfileModal from './EditProfileModal'
 
 const Profile = () => {
   const [coverImg, setCoverImg] = useState<string | null>(null)
@@ -27,6 +27,7 @@ const Profile = () => {
   const { username } = useParams()
 
   const { follow, isPending } = useFollow()
+
   const { data: authUser } = useQuery<SuccessResponse<GetProfileSuccessResponse>>({ queryKey: ['authUser'] })
 
   const { data, refetch, isLoading, isRefetching } = useQuery({
@@ -37,6 +38,7 @@ const Profile = () => {
   const isMyProfile = authUser?.data?.user._id === data?.data?.user._id
 
   const user = data?.data?.user
+  const memberSinceDate = formatMemberSinceDate(user?.createdAt as string)
 
   const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>, state: 'coverImg' | 'profileImg') => {
     let file
@@ -62,9 +64,9 @@ const Profile = () => {
       <div className='flex-[4_4_0]  border-r border-gray-700 min-h-screen '>
         {/* HEADER */}
         {(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
-        {!isLoading && !user && <p className='text-center text-lg mt-4'>User not found</p>}
+        {!isLoading && !isRefetching && !user && <p className='text-center text-lg mt-4'>User not found</p>}
         <div className='flex flex-col'>
-          {!isLoading && user && (
+          {!isLoading && !isRefetching && user && (
             <>
               <div className='flex gap-10 px-4 py-2 items-center'>
                 <Link to='/'>
@@ -173,7 +175,7 @@ const Profile = () => {
                   )}
                   <div className='flex gap-2 items-center'>
                     <IoCalendarOutline className='w-4 h-4 text-slate-500' />
-                    <span className='text-sm text-slate-500'>Joined July 2021</span>
+                    <span className='text-sm text-slate-500'>{memberSinceDate}</span>
                   </div>
                 </div>
                 <div className='flex gap-2'>
@@ -206,7 +208,7 @@ const Profile = () => {
             </>
           )}
 
-          <Posts feedType={'forYou'} />
+          <Posts feedType={feedType} username={username} userId={user?._id} />
         </div>
       </div>
     </>

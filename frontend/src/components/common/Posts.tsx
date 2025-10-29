@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
 import { apiFetch } from '../../utils/apiFetch'
-import { POSTS } from '../../utils/dummy'
 import type { GetPostsSuccessReponse } from '../../utils/type'
 import PostSkeleton from '../skeletons/PostSkeleton'
 import Post from './Post'
@@ -45,7 +44,7 @@ const Posts = ({ feedType, userId, username }: { feedType: FeedType; username?: 
 
   useEffect(() => {
     refetch()
-  }, [feedType, refetch])
+  }, [feedType, refetch, username])
 
   return (
     <>

@@ -49,11 +49,13 @@ const Post = ({ post }: { post: PostType }) => {
   })
 
   const likeMutation = useMutation({
-    mutationFn: async () =>
-      apiFetch<LikeSuccessResponse>(`api/posts/like/${post._id}`, {
+    mutationFn: async () => {
+      const url = `/api/posts/like/${post._id}`
+      return apiFetch<LikeSuccessResponse>(url, {
         method: 'POST',
         credentials: 'include'
-      }),
+      })
+    },
     onSuccess: (data) => {
       toast.success(data.message)
       queryClient.setQueryData(['posts'], (oldData: SuccessResponse<GetPostsSuccessReponse>) => {
@@ -76,6 +78,7 @@ const Post = ({ post }: { post: PostType }) => {
       })
     },
     onError: (error) => {
+      console.log('ERROR', error)
       toast.error(error.message)
     }
   })
