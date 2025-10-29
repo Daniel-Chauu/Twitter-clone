@@ -16,6 +16,7 @@ import type { SuccessResponse } from '../../utils/errors'
 import type { GetProfileSuccessResponse } from '../../utils/type'
 import EditProfileModal from './EditProfileModal'
 import toast from 'react-hot-toast'
+import useUpdateUserProfile from '../../hooks/useUpdateUserProfile'
 
 const Profile = () => {
   const [coverImg, setCoverImg] = useState<string | null>(null)
@@ -38,24 +39,7 @@ const Profile = () => {
     queryFn: async () => apiFetch<GetProfileSuccessResponse>(`/api/users/profile/${username}`)
   })
 
-  const { mutate: updateProfileMutate, isPending: isUpdating } = useMutation({
-    mutationFn: (body: { coverImg: string | null; profileImg: string | null }) =>
-      apiFetch('/api/users/update', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
-      }),
-    onSuccess: (data) => {
-      toast.success(data.message)
-      Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['authUser'] }),
-        queryClient.invalidateQueries({ queryKey: ['userProfile'] })
-      ])
-    },
-    onError: (error) => toast.error(error.message)
-  })
+  const { updateProfileMutate, isUpdating } = useUpdateUserProfile({ coverImg, profileImg })
 
   const isMyProfile = authUser?.data?.user._id === data?.data?.user._id
 
@@ -165,7 +149,11 @@ const Profile = () => {
                 {(coverImg || profileImg) && (
                   <button
                     className='btn btn-primary rounded-full btn-sm text-white px-4 ml-2'
-                    onClick={() => updateProfileMutate({ coverImg, profileImg })}
+                    onClick={async () => {
+                      await updateProfileMutate()
+                      setProfileImg(null)
+                      setCoverImg(null)
+                    }}
                   >
                     {isUpdating ? 'Updating...' : 'Update'}
                   </button>

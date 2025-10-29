@@ -1,11 +1,9 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { apiFetch } from '../../utils/apiFetch'
-import toast from 'react-hot-toast'
+import useUpdateUserProfile from '../../hooks/useUpdateUserProfile'
 import type { UserType } from '../../utils/type'
 
 type EditFormData = {
-  fullName: string
+  fullname: string
   username: string
   email: string
   bio: string
@@ -16,7 +14,7 @@ type EditFormData = {
 
 const EditProfileModal = ({ authUser }: { authUser?: UserType }) => {
   const [formData, setFormData] = useState<EditFormData>({
-    fullName: '',
+    fullname: '',
     username: '',
     email: '',
     bio: '',
@@ -24,27 +22,8 @@ const EditProfileModal = ({ authUser }: { authUser?: UserType }) => {
     newPassword: '',
     currentPassword: ''
   })
-  const queryClient = useQueryClient()
 
-  const { mutate: updateProfileMutate, isPending: isUpdating } = useMutation({
-    mutationFn: (body: Omit<EditFormData, 'username'>) =>
-      apiFetch('/api/users/update', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body),
-        credentials: 'include'
-      }),
-    onSuccess: (data) => {
-      toast.success(data.message)
-      Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['authUser'] }),
-        queryClient.invalidateQueries({ queryKey: ['userProfile'] })
-      ])
-    },
-    onError: (error) => toast.error(error.message)
-  })
+  const { updateProfileMutate, isUpdating } = useUpdateUserProfile<EditFormData>(formData)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -53,7 +32,7 @@ const EditProfileModal = ({ authUser }: { authUser?: UserType }) => {
   useEffect(() => {
     if (authUser) {
       setFormData({
-        fullName: authUser.fullname,
+        fullname: authUser.fullname,
         username: authUser.username,
         email: authUser.email,
         bio: authUser.bio,
@@ -82,7 +61,7 @@ const EditProfileModal = ({ authUser }: { authUser?: UserType }) => {
             className='flex flex-col gap-4'
             onSubmit={(e) => {
               e.preventDefault()
-              updateProfileMutate(formData)
+              updateProfileMutate()
             }}
           >
             <div className='flex flex-wrap gap-2'>
@@ -90,8 +69,8 @@ const EditProfileModal = ({ authUser }: { authUser?: UserType }) => {
                 type='text'
                 placeholder='Full Name'
                 className='flex-1 input border border-gray-700 rounded p-2 input-md'
-                value={formData.fullName}
-                name='fullName'
+                value={formData.fullname}
+                name='fullname'
                 onChange={handleInputChange}
               />
               <input
