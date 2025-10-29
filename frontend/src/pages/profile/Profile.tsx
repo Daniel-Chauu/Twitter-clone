@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 
-import { useQuery } from '@tanstack/react-query'
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { FaLink } from 'react-icons/fa'
 import { FaArrowLeft } from 'react-icons/fa6'
 import { IoCalendarOutline } from 'react-icons/io5'
@@ -15,6 +15,7 @@ import { POSTS } from '../../utils/dummy'
 import type { SuccessResponse } from '../../utils/errors'
 import type { GetProfileSuccessResponse } from '../../utils/type'
 import EditProfileModal from './EditProfileModal'
+import toast from 'react-hot-toast'
 
 const Profile = () => {
   const [coverImg, setCoverImg] = useState<string | null>(null)
@@ -23,6 +24,8 @@ const Profile = () => {
 
   const coverImgRef = useRef<HTMLInputElement | null>(null)
   const profileImgRef = useRef<HTMLInputElement | null>(null)
+
+  const queryClient = useQueryClient()
 
   const { username } = useParams()
 
@@ -33,6 +36,25 @@ const Profile = () => {
   const { data, refetch, isLoading, isRefetching } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => apiFetch<GetProfileSuccessResponse>(`/api/users/profile/${username}`)
+  })
+
+  const { mutate: updateProfileMutate, isPending: isUpdating } = useMutation({
+    mutationFn: (body: { coverImg: string | null; profileImg: string | null }) =>
+      apiFetch('/api/users/update', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      }),
+    onSuccess: (data) => {
+      toast.success(data.message)
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['authUser'] }),
+        queryClient.invalidateQueries({ queryKey: ['userProfile'] })
+      ])
+    },
+    onError: (error) => toast.error(error.message)
   })
 
   const isMyProfile = authUser?.data?.user._id === data?.data?.user._id
@@ -127,7 +149,7 @@ const Profile = () => {
                 </div>
               </div>
               <div className='flex justify-end px-4 mt-5'>
-                {isMyProfile && <EditProfileModal />}
+                {isMyProfile && <EditProfileModal authUser={authUser?.data?.user} />}
                 {!isMyProfile && (
                   <button
                     className='btn btn-outline rounded-full btn-sm'
@@ -143,9 +165,9 @@ const Profile = () => {
                 {(coverImg || profileImg) && (
                   <button
                     className='btn btn-primary rounded-full btn-sm text-white px-4 ml-2'
-                    onClick={() => alert('Profile updated successfully')}
+                    onClick={() => updateProfileMutate({ coverImg, profileImg })}
                   >
-                    Update
+                    {isUpdating ? 'Updating...' : 'Update'}
                   </button>
                 )}
               </div>
@@ -168,7 +190,7 @@ const Profile = () => {
                           rel='noreferrer'
                           className='text-sm text-blue-500 hover:underline'
                         >
-                          youtube.com/@asaprogrammer_
+                          {user.link}
                         </a>
                       </>
                     </div>
